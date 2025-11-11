@@ -11,8 +11,11 @@ extern int SPEED;
 extern bool shouldBeAutomated;
 
 void left();
+void carInit();
 void right();
 void forward();
 void backward();
 void stop();
 void handleCommand(char cmd);
+void resetYaw();
+void turnAngle(float targetAngle, bool leftTurn);

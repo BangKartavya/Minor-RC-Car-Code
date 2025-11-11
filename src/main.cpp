@@ -13,6 +13,8 @@ BluetoothSerial SerialBT;
 // 5V - ORANGE
 
 char lastHorn = 'x';
+volatile bool btDataReady = false;
+char btLastChar;
 
 void setup() {
     Serial.begin(115200);
@@ -22,45 +24,8 @@ void setup() {
     lastHorn = 'x';
     shouldBeAutomated = false;
 
-    Wire.begin(MPU_SDA, MPU_SCL, 100000); // SDA=19, SCL=22
-    delay(100);
-
-    Serial.println("Initializing MPU6050...");
-
-    mpu.initialize();
-    delay(100);
-
-    uint8_t id = mpu.getDeviceID();
-    Serial.print("Device ID: 0x");
-    Serial.println(id, HEX);
-
-    if(mpu.testConnection()) {
-        Serial.println("MPU6050 connection successful ✅");
-    } else {
-        Serial.println("MPU6050 connection failed ❌");
-    }
-    
-    pinMode(IN1, OUTPUT);
-    pinMode(IN2, OUTPUT);
-    pinMode(IN3, OUTPUT);
-    pinMode(IN4, OUTPUT);
-    pinMode(ENA, OUTPUT);
-    pinMode(ENB, OUTPUT);
-
-    stop();
-
-    pinMode(RIGHT_US_TRIG, OUTPUT);
-    pinMode(RIGHT_US_ECHO, INPUT);
-
-    pinMode(LEFT_US_TRIG, OUTPUT);
-    pinMode(LEFT_US_ECHO, INPUT);
-
-    pinMode(FRONT_US_TRIG, OUTPUT);
-    pinMode(FRONT_US_ECHO, INPUT);
-
-    digitalWrite(FRONT_US_TRIG, LOW);
-    digitalWrite(LEFT_US_TRIG, LOW);
-    digitalWrite(RIGHT_US_TRIG, LOW);
+    sensorInit();
+    carInit();
 }
 
 void loop() {
@@ -82,18 +47,19 @@ void loop() {
             double leftDistance = getDistance(LEFT_US_TRIG, LEFT_US_ECHO);
             double rightDistance = getDistance(RIGHT_US_TRIG, RIGHT_US_ECHO);
 
+            Serial.println("Front : " + String(frontDistance));
             Serial.println("Left : " + String(leftDistance));
             Serial.println("Right : " + String(rightDistance));
 
-            if(leftDistance >= THRESHOLD) {
-                // turn left before
-                left();
-            } else if(rightDistance >= THRESHOLD) {
-                // if left is blocked as well, turn right
-                right();
+            if(leftDistance > CLEAR_MARGIN) {
+                Serial.println("Turning LEFT 90°");
+                turnAngle(90.0, true);
+            } else if(rightDistance > CLEAR_MARGIN) {
+                Serial.println("Turning RIGHT 90°");
+                turnAngle(90.0, false);
             } else {
-                // complete block, reverse the car
-                backward();
+                Serial.println("Turning BACK 180°");
+                turnAngle(180.0, true); // or false, doesn’t matter
             }
         } else {
             forward();

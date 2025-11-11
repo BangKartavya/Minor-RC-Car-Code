@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include "car.h"
+#include "sensor.h"
 
 int SPEED = 0;
 bool shouldBeAutomated = false;
@@ -120,4 +121,42 @@ void handleCommand(char cmd) {
     default:
         break;
     }
+}
+
+void resetYaw() {
+    yaw = 0;
+    lastGyroTime = micros();
+}
+
+void turnAngle(float targetAngle, bool leftTurn) {
+    stop();
+    resetYaw();
+    delay(100);
+
+    if(leftTurn) left();
+    else right();
+
+    analogWrite(ENA, 128);
+    analogWrite(ENB, 128);
+
+    yaw = 0;
+    while(fabs(yaw) < targetAngle) {
+        updateYaw();
+        yield();
+        delay(TURN_CHECK_DELAY);
+    }
+
+    stop();
+    delay(200);
+}
+
+void carInit() {
+    pinMode(IN1, OUTPUT);
+    pinMode(IN2, OUTPUT);
+    pinMode(IN3, OUTPUT);
+    pinMode(IN4, OUTPUT);
+    pinMode(ENA, OUTPUT);
+    pinMode(ENB, OUTPUT);
+
+    stop();
 }
