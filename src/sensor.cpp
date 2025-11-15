@@ -5,6 +5,14 @@ float accArr[3] = {0, 0, 0};
 float yaw = 0;
 unsigned long lastGyroTime = 0;
 
+float gyroXoffset = 0;
+float gyroYoffset = 0;
+float gyroZoffset = 0;
+
+float dt = 0;
+unsigned long lastTime = 0;
+Angle old = {0, 0, 0};
+
 void sensorInit() {
     Wire.begin(MPU_SDA, MPU_SCL, 100000); // SDA=19, SCL=22
     delay(100);
@@ -36,6 +44,8 @@ void sensorInit() {
     digitalWrite(FRONT_US_TRIG, LOW);
     digitalWrite(LEFT_US_TRIG, LOW);
     digitalWrite(RIGHT_US_TRIG, LOW);
+
+    calibrateGyro(500);
 }
 
 double getDistance(int TRIG, int ECHO) {
@@ -78,4 +88,54 @@ float updateYaw() {
 
     yaw += (gz / GYRO_SCALE) * dt; // degrees
     return yaw;
+}
+void calibrateGyro(int samples) {
+    Serial.println("Calibrating gyro... keep still.");
+    long sumX = 0, sumY = 0, sumZ = 0;
+
+    for(int i = 0; i < samples; i++) {
+        int16_t ax, ay, az, gx, gy, gz;
+        mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+        sumX += gx;
+        sumY += gy;
+        sumZ += gz;
+        delay(5);
+    }
+
+    gyroXoffset = sumX / (float)samples / 131.0;
+    gyroYoffset = sumY / (float)samples / 131.0;
+    gyroZoffset = sumZ / (float)samples / 131.0;
+
+    Serial.printf("Offsets -> X: %.3f  Y: %.3f  Z: %.3f\n", gyroXoffset, gyroYoffset, gyroZoffset);
+}
+
+void getAngle() {
+    unsigned long now = micros();
+    dt = (now - lastTime) / 1e6;
+    lastTime = now;
+
+    int16_t ax, ay, az, gx, gy, gz;
+    mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
+
+    // --- Convert raw values ---
+    double accX = ax / 16384.0; // g
+    double accY = ay / 16384.0;
+    double accZ = az / 16384.0;
+
+    double gyroX = (gx / 131.0) - gyroXoffset; // deg/s
+    double gyroY = (gy / 131.0) - gyroYoffset;
+    double gyroZ = (gz / 131.0) - gyroZoffset;
+
+    // --- Integrate gyro to get angles ---
+    old.roll += gyroX * dt;
+    old.pitch += gyroY * dt;
+    old.yaw += gyroZ * dt;
+
+    // --- Calculate tilt angles from accelerometer ---
+    float accRoll = atan2(accY, accZ) * 180 / PI;
+    float accPitch = atan2(-accX, sqrt(accY * accY + accZ * accZ)) * 180 / PI;
+
+    // --- Complementary filter ---
+    old.roll = ALPHA * old.roll + (1 - ALPHA) * accRoll;
+    old.pitch = ALPHA * old.pitch + (1 - ALPHA) * accPitch;
 }
