@@ -6,6 +6,7 @@
 #include "car.h"
 #include "sensor.h"
 #include "print.h"
+#include "communication.h"
 
 BluetoothSerial SerialBT;
 // Motor driver pins
@@ -27,9 +28,12 @@ void setup() {
 
     sensorInit();
     carInit();
+    commInit();
 }
 
 void loop() {
+    sensorUpdate();
+    commSendOdom();
     static unsigned long lastAccRead = 0;
     if(millis() - lastAccRead > 200) {
         getAccValues();
