@@ -1,5 +1,9 @@
+#ifdef BUILD_TX
 #pragma once
+
 #include <Arduino.h>
+#include <Wifi.h>
+#include <esp_now.h>
 
 // Call once in setup()
 void commInit();
@@ -16,3 +20,5 @@ struct OdomPacket {
         float yaw;
         uint32_t timestamp;
 };
+
+#endif

@@ -1,0 +1,10 @@
+# Name,   Type, Subtype, Offset,  Size,  Flags
+#
+# Dedicated to a single large application.
+# Total size is 4MB (0x400000)
+#
+nvs,      data, nvs,     0x9000,  0x5000,
+otadata,  data, ota,     0xe000,  0x2000,
+phy_init, data, phy,     0x10000, 0x1000,
+factory,  app,  factory, 0x11000, 0x300000, # 3MB (3 * 1024 * 1024 = 3145728 bytes)
+storage,  data, spiffs,  0x311000, 0xEE000,

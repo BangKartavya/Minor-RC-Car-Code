@@ -1,10 +1,8 @@
 #include "communication.h"
-#include <esp_now.h>
-#include <WiFi.h>
 #include "sensor.h" // <-- because we need posX, posY, velX, velY, old.yaw
 
 // Broadcast MAC (send to all ESP-NOW receivers)
-uint8_t broadcastAddr[] = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
+uint8_t broadcastAddr[] = {0x6C, 0xC8, 0x40, 0x4D, 0xDD, 0xB0};
 
 static bool espNowReady = false;
 
@@ -16,30 +14,35 @@ void onDataSent(const uint8_t* mac, esp_now_send_status_t status) {
 
 // ------------------ INIT ------------------
 void commInit() {
-    WiFi.mode(WIFI_STA);
+    // 1. Initialize Wi-Fi and set the mode (STA is required for ESP-NOW)
+    // This single call handles all underlying NVS, driver, and stack initialization.
+    WiFi.mode(WIFI_MODE_STA);
+    Serial.println("Wi-Fi Mode set to STATION.");
 
+    // 2. Initialize ESP-NOW
     if(esp_now_init() != ESP_OK) {
         Serial.println("ESP-NOW init failed!");
         return;
     }
+    Serial.println("ESP-NOW initialized successfully.");
 
+    // 3. Register the send callback
     esp_now_register_send_cb(onDataSent);
 
-    // Add broadcast peer
+    // 4. ADD THE RECEIVER AS A PEER (Critical for Unicast)
     esp_now_peer_info_t peer = {};
     memcpy(peer.peer_addr, broadcastAddr, 6);
     peer.channel = 0;
     peer.encrypt = false;
 
     if(esp_now_add_peer(&peer) != ESP_OK) {
-        Serial.println("Failed to add ESP-NOW peer!");
+        Serial.println("Failed to add Receiver peer!");
         return;
     }
 
     espNowReady = true;
-    Serial.println("ESP-NOW ready");
+    Serial.println("Communication Ready. Peer added.");
 }
-
 // ------------------ SEND ODOMETRY ------------------
 void commSendOdom() {
     if(!espNowReady) return;

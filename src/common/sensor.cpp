@@ -2,7 +2,6 @@
 
 MPU6050 mpu(0x68);
 float accArr[3] = {0, 0, 0};
-float yaw = 0;
 unsigned long lastGyroTime = 0;
 
 TinyGPSPlus gps;
@@ -28,6 +27,11 @@ static float zuptBuf[ZUPT_WIN][3];
 static int zuptIdx = 0;
 static bool originSet = false;
 static double originLat = 0.0, originLon = 0.0;
+
+void resetYaw() {
+    old.yaw = 0;
+    lastGyroTime = micros();
+}
 
 void sensorInit() {
     Wire.begin(MPU_SDA, MPU_SCL, 100000); // SDA=19, SCL=22
@@ -65,14 +69,11 @@ void sensorInit() {
     Serial.println("Starting GPS");
     GPS_Serial.begin(9600, SERIAL_8N1, GPS_RX, GPS_TX); // RX=33, TX=32
 
-    // drain initial GPS bytes non-blocking
-    while(GPS_Serial.available()) {
+    if(GPS_Serial.available()) {
         gps.encode(GPS_Serial.read());
-        lastGyroTime = millis(); // mark last time GPS sent a byte
-    }
-
-    if(millis() - lastGyroTime > 2000) {
-        Serial.println("GPS not sending data (bad wiring, wrong RX/TX or baud).");
+        Serial.println("GPS Serial: Data detected immediately after initialization. Assuming connected.");
+    } else {
+        Serial.println("GPS Serial: No data available immediately. Will check in loop().");
     }
 
     // init ZUPT buffer with 1g values (rough)
@@ -124,8 +125,8 @@ float updateYaw() {
     float dt = (now - lastGyroTime) / 1000000.0; // seconds
     lastGyroTime = now;
 
-    yaw += (gz / GYRO_SCALE) * dt; // degrees
-    return yaw;
+    old.yaw += (gz / GYRO_SCALE) * dt; // degrees
+    return old.yaw;
 }
 
 void calibrateGyro(int samples) {

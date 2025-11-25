@@ -27,8 +27,11 @@ void setup() {
     shouldBeAutomated = false;
 
     sensorInit();
+    Serial.println("Initialized Sensors");
     carInit();
+    Serial.println("Initialized Car");
     commInit();
+    Serial.println("Initialized Communication");
 }
 
 void loop() {

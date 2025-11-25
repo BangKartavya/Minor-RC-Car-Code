@@ -26,6 +26,7 @@ void setup() {
     WiFi.mode(WIFI_STA);
     esp_now_init();
     esp_now_register_recv_cb(onDataRecv);
+    Serial.println("MAC ADD : " + WiFi.macAddress());
 }
 
 void loop() {
