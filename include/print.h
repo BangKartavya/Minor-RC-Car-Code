@@ -1,4 +1,6 @@
+#ifdef BUILD_TX
 #pragma once
+
 #include <Arduino.h>
 #include "sensor.h"
 
@@ -27,3 +29,5 @@ extern float ax;
 extern float ay;
 extern float az;
 extern int speedVal;
+
+#endif

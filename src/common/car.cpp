@@ -123,11 +123,6 @@ void handleCommand(char cmd) {
     }
 }
 
-void resetYaw() {
-    yaw = 0;
-    lastGyroTime = micros();
-}
-
 void turnAngle(float targetAngle, bool leftTurn) {
     stop();
     resetYaw();
@@ -139,8 +134,8 @@ void turnAngle(float targetAngle, bool leftTurn) {
     analogWrite(ENA, 128);
     analogWrite(ENB, 128);
 
-    yaw = 0;
-    while(fabs(yaw) < targetAngle) {
+    old.yaw = 0;
+    while(fabs(old.yaw) < targetAngle) {
         updateYaw();
         yield();
         delay(TURN_CHECK_DELAY);

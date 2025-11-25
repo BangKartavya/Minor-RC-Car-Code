@@ -1,3 +1,5 @@
+#ifdef BUILD_TX
+
 #pragma once
 
 #define IN1 14 // BLACK
@@ -19,3 +21,5 @@ void stop();
 void handleCommand(char cmd);
 void resetYaw();
 void turnAngle(float targetAngle, bool leftTurn);
+
+#endif

@@ -1,3 +1,5 @@
+#ifdef BUILD_TX
+
 #pragma once
 #include "MPU6050.h"
 #include <HardwareSerial.h>
@@ -41,10 +43,10 @@ void sensorInit();
 void calibrateGyro(int samples);
 void getAngle();
 void sensorUpdate();
+void resetYaw();
 
 extern MPU6050 mpu;
 extern float accArr[3];
-extern float yaw;
 extern unsigned long lastGyroTime;
 extern float gyroXoffset;
 extern float gyroYoffset;
@@ -59,3 +61,4 @@ extern float posX_imu;
 extern float posY_imu;
 extern float velX;
 extern float velY;
+#endif
