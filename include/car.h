@@ -11,6 +11,16 @@
 
 extern int SPEED;
 extern bool shouldBeAutomated;
+extern bool turningFastLoop;
+
+enum TurnState {
+    TURN_IDLE,
+    TURN_START,
+    TURN_EXECUTE,
+    TURN_FINISH
+};
+
+extern TurnState turnState;
 
 void left();
 void carInit();
@@ -21,5 +31,8 @@ void stop();
 void handleCommand(char cmd);
 void resetYaw();
 void turnAngle(float targetAngle, bool leftTurn);
+void updateTurnStateMachine();
+void startTurn(float angleDeg, bool left);
+void updateTurn();
 
 #endif

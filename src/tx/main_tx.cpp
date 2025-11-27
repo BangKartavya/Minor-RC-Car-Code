@@ -37,6 +37,7 @@ void setup() {
 void loop() {
     sensorUpdate();
     commSendOdom();
+
     static unsigned long lastAccRead = 0;
     if(millis() - lastAccRead > 200) {
         getAccValues();
@@ -51,6 +52,7 @@ void loop() {
 
         if(frontDistance < THRESHOLD) {
             stop();
+            imuZUPT();
             // obstacle detected in front (go either left or right)
             double leftDistance = getDistance(LEFT_US_TRIG, LEFT_US_ECHO);
             double rightDistance = getDistance(RIGHT_US_TRIG, RIGHT_US_ECHO);
@@ -61,14 +63,15 @@ void loop() {
 
             if(leftDistance > CLEAR_MARGIN) {
                 Serial.println("Turning LEFT 90°");
-                turnAngle(90.0, true);
+                turnAngle(90, true);
             } else if(rightDistance > CLEAR_MARGIN) {
                 Serial.println("Turning RIGHT 90°");
-                turnAngle(90.0, false);
+                turnAngle(90, false);
             } else {
                 Serial.println("Turning BACK 180°");
-                turnAngle(180.0, true); // or false, doesn’t matter
+                turnAngle(180, true); // or false, doesn’t matter
             }
+            imuZUPT();
         } else {
             forward();
         }

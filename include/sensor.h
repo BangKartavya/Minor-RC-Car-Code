@@ -38,12 +38,13 @@ struct Angle {
 
 double getDistance(int TRIG, int ECHO);
 void getAccValues();
-float updateYaw();
 void sensorInit();
 void calibrateGyro(int samples);
 void getAngle();
 void sensorUpdate();
 void resetYaw();
+void gpsUpdate();
+void imuZUPT();
 
 extern MPU6050 mpu;
 extern float accArr[3];
@@ -55,6 +56,7 @@ extern Angle old;
 extern TinyGPSPlus gps;
 extern HardwareSerial GPS_Serial;
 
+extern unsigned long lastTime;
 extern float posX;
 extern float posY;
 extern float posX_imu;

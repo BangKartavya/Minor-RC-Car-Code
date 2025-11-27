@@ -5,6 +5,12 @@
 int SPEED = 0;
 bool shouldBeAutomated = false;
 
+TurnState turnState = TURN_IDLE;
+float turnTarget = 0;
+bool turnLeft = false;
+unsigned long turnStartTime = 0;
+bool turningFastLoop = false;
+
 void left() {
     digitalWrite(IN1, HIGH);
     digitalWrite(IN2, LOW);
@@ -123,6 +129,22 @@ void handleCommand(char cmd) {
     }
 }
 
+void updateTurn() {
+    if(turnState != TURN_IDLE) return;
+
+    // HIGH-FREQUENCY TURN LOOP
+    for(int i = 0; i < 10; i++) {
+        getAngle(); // run IMU update 10x per main loop
+    }
+
+    if(fabs(old.yaw) >= turnTarget) {
+        stop();
+        imuZUPT();
+        old.yaw = 0;
+        turningFastLoop = false; // disable fast loop
+    }
+}
+
 void turnAngle(float targetAngle, bool leftTurn) {
     stop();
     resetYaw();
@@ -136,7 +158,7 @@ void turnAngle(float targetAngle, bool leftTurn) {
 
     old.yaw = 0;
     while(fabs(old.yaw) < targetAngle) {
-        updateYaw();
+        getAngle();
         yield();
         delay(TURN_CHECK_DELAY);
     }
@@ -154,4 +176,61 @@ void carInit() {
     pinMode(ENB, OUTPUT);
 
     stop();
+}
+
+void startTurn(float angleDeg, bool left) {
+    if(turnState != TURN_IDLE) return;
+    turnTarget = angleDeg;
+    turnLeft = left;
+
+    // Reset yaw + timestamp BEFORE turning
+    old.yaw = 0;
+    lastTime = micros();
+
+    turnState = TURN_START;
+}
+
+void updateTurnStateMachine() {
+    switch(turnState) {
+    case TURN_IDLE:
+        break;
+
+    case TURN_START:
+        stop();
+        delay(50);
+
+        // reset yaw again to be safe
+        old.yaw = 0;
+        lastTime = micros();
+
+        if(turnLeft) left();
+        else right();
+
+        analogWrite(ENA, 120); // <-- use enough PWM
+        analogWrite(ENB, 120);
+
+        turnStartTime = millis();
+        turnState = TURN_EXECUTE;
+        break;
+
+    case TURN_EXECUTE:
+        getAngle();
+
+        // DEBUG
+        Serial.print("Yaw = ");
+        Serial.println(old.yaw);
+
+        if(fabs(old.yaw) >= turnTarget) {
+            stop();
+            turnState = TURN_FINISH;
+        }
+        break;
+
+    case TURN_FINISH:
+        delay(80);
+        imuZUPT();
+        old.yaw = 0;
+        turnState = TURN_IDLE;
+        break;
+    }
 }

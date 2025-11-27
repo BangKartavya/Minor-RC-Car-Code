@@ -22,6 +22,8 @@ float dt = 0;
 unsigned long lastTime = 0;
 Angle old = {0, 0, 0};
 
+String nmeaLine = "";
+
 // ----------------- internal helpers -----------------
 static float zuptBuf[ZUPT_WIN][3];
 static int zuptIdx = 0;
@@ -69,6 +71,12 @@ void sensorInit() {
     Serial.println("Starting GPS");
     GPS_Serial.begin(9600, SERIAL_8N1, GPS_RX, GPS_TX); // RX=33, TX=32
 
+    delay(500);
+    GPS_Serial.println("$PCAS03,1,1,1,1,1,1*00");
+    GPS_Serial.println("$PCAS03,1,1,1,1,1,1*4B");
+    GPS_Serial.println("$PCAS03,1,1,1,1,1,1*55");
+    GPS_Serial.println("$PCAS03,1,1,1,1,1,1*7A");
+
     if(GPS_Serial.available()) {
         gps.encode(GPS_Serial.read());
         Serial.println("GPS Serial: Data detected immediately after initialization. Assuming connected.");
@@ -115,18 +123,6 @@ void getAccValues() {
     accArr[0] = ax_g;
     accArr[1] = ay_g;
     accArr[2] = az_g;
-}
-
-float updateYaw() {
-    int16_t ax, ay, az, gx, gy, gz;
-    mpu.getMotion6(&ax, &ay, &az, &gx, &gy, &gz);
-
-    unsigned long now = micros();
-    float dt = (now - lastGyroTime) / 1000000.0; // seconds
-    lastGyroTime = now;
-
-    old.yaw += (gz / GYRO_SCALE) * dt; // degrees
-    return old.yaw;
 }
 
 void calibrateGyro(int samples) {
@@ -208,6 +204,8 @@ void imuZUPT() {
     // externally enforce zero velocity and gently reduce biases
     velX = 0.0f;
     velY = 0.0f;
+    posX_imu = posX;
+
     // small bias decay (if you want to implement bias state later, do here)
     // nothing aggressive on purpose
 }
@@ -295,11 +293,14 @@ void sensorUpdate() {
     }
 
     // 4) GPS bytes parse (non-blocking) and fusion (when GPS updates)
-    while(GPS_Serial.available()) {
-        gps.encode(GPS_Serial.read());
-    }
-
+    gpsUpdate();
     if(gps.location.isUpdated() && gps.location.isValid()) {
+        // Serial.print("Lat: ");
+        // Serial.print(gps.location.lat(), 6);
+        // Serial.print("  Lon: ");
+        // Serial.println(gps.location.lng(), 6);
+        // Serial.print("Satellites: ");
+        // Serial.println(gps.satellites.value());
         double lat = gps.location.lat();
         double lon = gps.location.lng();
 
@@ -318,7 +319,26 @@ void sensorUpdate() {
         posY = (1.0f - beta) * posY_imu + beta * gy;
 
         // reset IMU integrated pos toward fused result to avoid long-term divergence
-        posX_imu = posX;
-        posY_imu = posY;
+    }
+}
+
+void gpsUpdate() {
+    while(GPS_Serial.available()) {
+        char c = GPS_Serial.read();
+
+        if(c == '$') {
+            nmeaLine = "$";
+        } else if(nmeaLine.length() > 0) {
+            if(c == '\n') {
+                // Serial.println("NMEA: " + nmeaLine);
+                // feed TinyGPS
+                for(char& x : nmeaLine)
+                    gps.encode(x);
+                gps.encode('\n');
+                nmeaLine = "";
+            } else if(c != '\r') {
+                nmeaLine += c;
+            }
+        }
     }
 }
