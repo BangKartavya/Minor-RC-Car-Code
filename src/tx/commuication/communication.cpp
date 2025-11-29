@@ -1,21 +1,16 @@
 #include "communication.h"
-#include "sensor.h" // <-- because we need posX, posY, velX, velY, old.yaw
+#include "sensor.h"
 
-// Broadcast MAC (send to all ESP-NOW receivers)
-uint8_t broadcastAddr[] = {0x6C, 0xC8, 0x40, 0x4D, 0xDD, 0xB0};
+uint8_t Communication::broadcastAddr[] = {0x6C, 0xC8, 0x40, 0x4D, 0xDD, 0xB0};
+bool Communication::ESPNOWReady = false;
 
-static bool espNowReady = false;
-
-// ------------------ SEND CALLBACK ------------------
 void onDataSent(const uint8_t* mac, esp_now_send_status_t status) {
     // optional: you can print transmission status here
     // (don't print every time — slows loop)
 }
 
-// ------------------ INIT ------------------
-void commInit() {
-    // 1. Initialize Wi-Fi and set the mode (STA is required for ESP-NOW)
-    // This single call handles all underlying NVS, driver, and stack initialization.
+void Communication::Init() {
+    ESPNOWReady = false;
     WiFi.mode(WIFI_MODE_STA);
     Serial.println("Wi-Fi Mode set to STATION.");
 
@@ -40,19 +35,19 @@ void commInit() {
         return;
     }
 
-    espNowReady = true;
+    ESPNOWReady = true;
     Serial.println("Communication Ready. Peer added.");
 }
-// ------------------ SEND ODOMETRY ------------------
-void commSendOdom() {
-    if(!espNowReady) return;
+
+void Communication::SendOdom() {
+    if(!ESPNOWReady) return;
 
     OdomPacket pkt;
-    pkt.px = posX;
-    pkt.py = posY;
-    pkt.vx = velX;
-    pkt.vy = velY;
-    pkt.yaw = old.yaw;
+    pkt.px = Sensor::PosX;
+    pkt.py = Sensor::PosY;
+    pkt.vx = Sensor::VelX;
+    pkt.vy = Sensor::VelY;
+    pkt.yaw = MPU::Old.yaw;
     pkt.timestamp = millis();
 
     // Non-blocking async send

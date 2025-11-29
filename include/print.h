@@ -1,8 +1,6 @@
-#ifdef BUILD_TX
 #pragma once
 
 #include <Arduino.h>
-#include "sensor.h"
 
 // --- ANSI helpers ---
 #define ESC "\x1B"
@@ -17,17 +15,31 @@
 #define WHITE CSI "37m"
 #define RESET CSI "0m"
 
-void printTableRow(double f, double l, double r, float ax, float ay, float az, int spd);
-void printTableHeader();
-void ansiMoveCursor(int row, int col);
-void ansiClear();
+typedef const char* (*ColourFunction)(double v);
 
-extern double frontVal;
-extern double leftVal;
-extern double rightVal;
-extern float ax;
-extern float ay;
-extern float az;
-extern int speedVal;
+struct LiveColumn {
+        const char* header; // column title
+        const char* fmt;    // printf format string, e.g. "%.2f"
+        int width;          // column width
+        ColourFunction color;
+};
 
-#endif
+class LiveTable {
+    private:
+        LiveTable();
+
+    private:
+        static void AnsiClear();
+        static void AnsiMoveCursor(int row, int col);
+
+    public:
+        static LiveTable*& Instance();
+        static void Configure(LiveColumn* column, int count, int row);
+        static void Init(double vals[]);
+        static void Update(double vals[]);
+
+    public:
+        static LiveColumn* Cols;
+        static int Count;
+        static int RowY; // which row to print the live row on
+};

@@ -1,59 +1,54 @@
 #include <Arduino.h>
-#include "BluetoothSerial.h"
-#include <Arduino.h>
-#include <MPU6050.h>
-#include <Wire.h>
+#include <BluetoothSerial.h>
 #include "car.h"
 #include "sensor.h"
-#include "print.h"
 #include "communication.h"
+#include "time.h"
 
 BluetoothSerial SerialBT;
-// Motor driver pins
-
-// 5V - YELLOW
-// 5V - ORANGE
-
 char lastHorn = 'x';
 volatile bool btDataReady = false;
 char btLastChar;
 
 void setup() {
     Serial.begin(115200);
-    SerialBT.begin("ESP32_RC_Car"); // Bluetooth name
+    Serial.begin(115200);
+    SerialBT.begin("GroundEye"); // Bluetooth name
     Serial.println("Bluetooth RC Car Ready. Connect via app!");
-    SPEED = 0;
     lastHorn = 'x';
-    shouldBeAutomated = false;
+    Car::ShouldBeAutomated = false;
 
-    sensorInit();
+    Sensor::Init();
     Serial.println("Initialized Sensors");
-    carInit();
+    Car::Init();
     Serial.println("Initialized Car");
-    commInit();
+    Communication::Init();
     Serial.println("Initialized Communication");
 }
 
 void loop() {
-    sensorUpdate();
-    commSendOdom();
+    double dt = Time::ComputeDt();
+    Sensor::Update(dt);
+    Communication::SendOdom();
+
     static unsigned long lastAccRead = 0;
     if(millis() - lastAccRead > 200) {
-        getAccValues();
+        MPU::GetAccValues();
         lastAccRead = millis();
     }
 
-    if(shouldBeAutomated) {
-        SPEED = 128;
-        analogWrite(ENA, SPEED);
-        analogWrite(ENB, SPEED);
-        double frontDistance = getDistance(FRONT_US_TRIG, FRONT_US_ECHO);
+    if(Car::ShouldBeAutomated) {
+        Car::Speed = 128;
+        analogWrite(ENA, Car::Speed);
+        analogWrite(ENB, Car::Speed);
+        double frontDistance = UltraSonic::GetDistance(FRONT_US_TRIG, FRONT_US_ECHO);
 
-        if(frontDistance < THRESHOLD) {
-            stop();
+        if(frontDistance < CLEAR_MARGIN) {
+            Car::Stop();
+            Sensor::IMUZUPT();
             // obstacle detected in front (go either left or right)
-            double leftDistance = getDistance(LEFT_US_TRIG, LEFT_US_ECHO);
-            double rightDistance = getDistance(RIGHT_US_TRIG, RIGHT_US_ECHO);
+            double leftDistance = UltraSonic::GetDistance(LEFT_US_TRIG, LEFT_US_ECHO);
+            double rightDistance = UltraSonic::GetDistance(RIGHT_US_TRIG, RIGHT_US_ECHO);
 
             Serial.println("Front : " + String(frontDistance));
             Serial.println("Left : " + String(leftDistance));
@@ -61,16 +56,17 @@ void loop() {
 
             if(leftDistance > CLEAR_MARGIN) {
                 Serial.println("Turning LEFT 90°");
-                turnAngle(90.0, true);
+                Car::TurnAngle(90, true);
             } else if(rightDistance > CLEAR_MARGIN) {
                 Serial.println("Turning RIGHT 90°");
-                turnAngle(90.0, false);
+                Car::TurnAngle(90, false);
             } else {
                 Serial.println("Turning BACK 180°");
-                turnAngle(180.0, true); // or false, doesn’t matter
+                Car::TurnAngle(180, true); // or false, doesn’t matter
             }
+            Sensor::IMUZUPT();
         } else {
-            forward();
+            Car::Forward();
         }
     }
     if(SerialBT.hasClient()) {
@@ -78,12 +74,12 @@ void loop() {
             char command = SerialBT.read();
 
             if((command == 'X' || command == 'x') && command != lastHorn) {
-                shouldBeAutomated = (command == 'X');
+                Car::ShouldBeAutomated = (command == 'X');
                 lastHorn = command;
             }
 
-            if(!shouldBeAutomated)
-                handleCommand(command);
+            if(!Car::ShouldBeAutomated)
+                Car::HandleCommand(command);
         }
     }
 }

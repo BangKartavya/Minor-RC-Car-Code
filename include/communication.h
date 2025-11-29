@@ -5,13 +5,6 @@
 #include <Wifi.h>
 #include <esp_now.h>
 
-// Call once in setup()
-void commInit();
-
-// Call every loop() (very lightweight)
-void commSendOdom();
-
-// Structure of the odometry packet
 struct OdomPacket {
         float px;
         float py;
@@ -19,6 +12,19 @@ struct OdomPacket {
         float vy;
         float yaw;
         uint32_t timestamp;
+};
+
+class Communication {
+    private:
+        Communication();
+
+    public:
+        static void Init();
+        static void SendOdom();
+
+    private:
+        static bool ESPNOWReady;
+        static uint8_t broadcastAddr[];
 };
 
 #endif
