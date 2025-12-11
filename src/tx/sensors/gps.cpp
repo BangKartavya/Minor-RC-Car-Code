@@ -15,8 +15,6 @@ void GPS::Update() {
             NMEALine = "$";
         } else if(NMEALine.length() > 0) {
             if(c == '\n') {
-                // Serial.println("NMEA: " + NMEALine);
-                // feed TinyGPS
                 for(const char& x : NMEALine)
                     Gps.encode(x);
                 Gps.encode('\n');
@@ -26,8 +24,6 @@ void GPS::Update() {
             }
         }
     }
-
-    Serial.println(NMEALine);
 }
 
 void GPS::Init() {
@@ -51,4 +47,8 @@ void GPS::Init() {
     OriginSet = false;
     OriginLat = 0.0;
     OriginLon = 0.0;
+}
+
+void GPS::Print() {
+    Serial.println(NMEALine);
 }

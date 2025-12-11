@@ -8,9 +8,16 @@
 struct OdomPacket {
         float px;
         float py;
+
         float vx;
         float vy;
+
         float yaw;
+
+        float ax;
+        float ay;
+        float az;
+
         uint32_t timestamp;
 };
 

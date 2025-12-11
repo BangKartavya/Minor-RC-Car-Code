@@ -1,6 +1,6 @@
 #include "mpu.h"
 
-Angle MPU::Old = {0, 0, 0};
+Angle MPU::Gyro = {0, 0, 0};
 Angle MPU::Offset = {0, 0, 0};
 MPU6050 MPU::Mpu(0x68);
 Acceleration MPU::Acc = {0, 0, 0};
@@ -15,7 +15,7 @@ void MPU::GetAccValues() {
     double ay_g = ay / 16384.0;
     double az_g = az / 16384.0;
 
-    Acc = {ax_g, ay_g, az_g};
+    Acc = {ax_g, ay_g, -az_g};
 }
 
 void MPU::Init() {
@@ -38,7 +38,7 @@ void MPU::Init() {
     }
     Offset = {0, 0, 0};
     Acc = {0, 0, 0};
-    Old = {0, 0, 0};
+    Gyro = {0, 0, 0};
     CalibrateGyro(500);
 }
 
@@ -76,23 +76,22 @@ void MPU::GetAngle(double dt) {
     double gyroZ = (gz / 131.0) - Offset.yaw;
 
     // --- Integrate gyro to get angles ---
-    Old.roll += gyroX * dt;
-    Old.pitch += gyroY * dt;
-    Old.yaw += gyroZ * dt;
+    Gyro.roll += gyroX * dt;
+    Gyro.pitch += gyroY * dt;
+    Gyro.yaw += gyroZ * dt;
 
     // --- Calculate tilt angles from accelerometer ---
     float accRoll = atan2(accY, accZ) * 180 / PI;
     float accPitch = atan2(-accX, sqrt(accY * accY + accZ * accZ)) * 180 / PI;
 
     // --- Complementary filter ---
-    Old.roll = ALPHA * Old.roll + (1 - ALPHA) * accRoll;
-    Old.pitch = ALPHA * Old.pitch + (1 - ALPHA) * accPitch;
+    Gyro.roll = ALPHA * Gyro.roll + (1 - ALPHA) * accRoll;
+    Gyro.pitch = ALPHA * Gyro.pitch + (1 - ALPHA) * accPitch;
 
-    // yaw remains integrated gyro (you may optionally add magnetometer fusion later)
     // store accArr for compatibility
     Acc = {accX, accY, accZ};
 }
 
 void MPU::ResetYaw() {
-    Old.yaw = 0;
+    Gyro.yaw = 0;
 }

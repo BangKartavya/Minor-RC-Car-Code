@@ -46,7 +46,7 @@ void loop() {
         if(frontDistance < CLEAR_MARGIN) {
             Car::Stop();
             Sensor::IMUZUPT();
-            // obstacle detected in front (go either left or right)
+
             double leftDistance = UltraSonic::GetDistance(LEFT_US_TRIG, LEFT_US_ECHO);
             double rightDistance = UltraSonic::GetDistance(RIGHT_US_TRIG, RIGHT_US_ECHO);
 
@@ -69,6 +69,7 @@ void loop() {
             Car::Forward();
         }
     }
+
     if(SerialBT.hasClient()) {
         if(SerialBT.available()) {
             char command = SerialBT.read();
@@ -81,5 +82,8 @@ void loop() {
             if(!Car::ShouldBeAutomated)
                 Car::HandleCommand(command);
         }
+    } else {
+        Car::ShouldBeAutomated = false;
+        Car::Stop();
     }
 }

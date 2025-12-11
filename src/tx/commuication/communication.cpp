@@ -5,8 +5,6 @@ uint8_t Communication::broadcastAddr[] = {0x6C, 0xC8, 0x40, 0x4D, 0xDD, 0xB0};
 bool Communication::ESPNOWReady = false;
 
 void onDataSent(const uint8_t* mac, esp_now_send_status_t status) {
-    // optional: you can print transmission status here
-    // (don't print every time — slows loop)
 }
 
 void Communication::Init() {
@@ -14,17 +12,14 @@ void Communication::Init() {
     WiFi.mode(WIFI_MODE_STA);
     Serial.println("Wi-Fi Mode set to STATION.");
 
-    // 2. Initialize ESP-NOW
     if(esp_now_init() != ESP_OK) {
         Serial.println("ESP-NOW init failed!");
         return;
     }
     Serial.println("ESP-NOW initialized successfully.");
 
-    // 3. Register the send callback
     esp_now_register_send_cb(onDataSent);
 
-    // 4. ADD THE RECEIVER AS A PEER (Critical for Unicast)
     esp_now_peer_info_t peer = {};
     memcpy(peer.peer_addr, broadcastAddr, 6);
     peer.channel = 0;
@@ -47,7 +42,10 @@ void Communication::SendOdom() {
     pkt.py = Sensor::PosY;
     pkt.vx = Sensor::VelX;
     pkt.vy = Sensor::VelY;
-    pkt.yaw = MPU::Old.yaw;
+    pkt.yaw = MPU::Gyro.yaw;
+    pkt.ax = MPU::Acc.x;
+    pkt.ay = MPU::Acc.y;
+    pkt.az = MPU::Acc.z;
     pkt.timestamp = millis();
 
     // Non-blocking async send

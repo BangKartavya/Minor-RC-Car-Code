@@ -41,7 +41,7 @@ bool Sensor::DetectZUPTWindow() {
         var += d * d;
     }
     var /= ZUPT_WIN;
-    return (var < ZUPT_VAR_THRESH && fabsf(mean - 1.0f) < ZUPT_MAG_THRESH);
+    return (var < ZUPT_VAR_THRESH && fabsf(mean - 9.80665f) < (ZUPT_MAG_THRESH * 9.80665f));
 }
 
 void Sensor::IMUZUPT() {
@@ -51,7 +51,7 @@ void Sensor::IMUZUPT() {
 }
 
 void Sensor::LatLonToXY(double lat, double lon, float& x, float& y) {
-    if(!GPS::OriginSet) {
+    if(!GPS::OriginSet && GPS::Gps.location.isValid()) {
         x = y = 0.0f;
         return;
     }
@@ -61,48 +61,75 @@ void Sensor::LatLonToXY(double lat, double lon, float& x, float& y) {
 }
 
 void Sensor::Update(double dt) {
+    const float GRAV = 9.80665f;
+
     MPU::GetAngle(dt);
     MPU::GetAccValues();
 
-    float rollRad = MPU::Old.roll * (PI / 180.0);
-    float pitchRad = MPU::Old.pitch * (PI / 180.0);
+    float ax_body = MPU::Acc.x * GRAV;
+    float ay_body = MPU::Acc.y * GRAV;
+    float az_body = MPU::Acc.z * GRAV;
 
-    float axMS = MPU::Acc.x * 9.80665f;
-    float ayMS = MPU::Acc.y * 9.80665f;
-    float azMS = MPU::Acc.z * 9.80665f;
+    float gyroMag = fabs(MPU::Gyro.pitch) + fabs(MPU::Gyro.yaw) + fabs(MPU::Gyro.roll);
 
-    float sinRoll = sinf(rollRad);
-    float cosRoll = cosf(rollRad);
-    float sinPitch = sinf(pitchRad);
-    float cosPitch = cosf(pitchRad);
-
-    float awX = axMS * cosPitch + azMS * sinPitch;
-    float awY = axMS * sinRoll * sinPitch + ayMS * cosRoll - azMS * sinRoll * cosPitch;
-    float awZ = -axMS * cosRoll * sinPitch + ayMS * sinRoll + azMS * cosRoll * cosPitch;
-
-    float linAX = awX;
-    float linAY = awY;
-    float linAZ = awZ - 9.80665f;
-
-    ZUPTBuff[ZuptIdx][0] = MPU::Acc.x;
-    ZUPTBuff[ZuptIdx][1] = MPU::Acc.y;
-    ZUPTBuff[ZuptIdx][2] = MPU::Acc.z;
+    ZUPTBuff[ZuptIdx][0] = ax_body;
+    ZUPTBuff[ZuptIdx][1] = ay_body;
+    ZUPTBuff[ZuptIdx][2] = az_body;
     ZuptIdx = (ZuptIdx + 1) % ZUPT_WIN;
 
-    bool isZupt = DetectZUPTWindow();
+    float rollRad = MPU::Gyro.roll * (M_PI / 180.0f);
+    float pitchRad = MPU::Gyro.pitch * (M_PI / 180.0f);
+    float yawRad = MPU::Gyro.yaw * (M_PI / 180.0f);
 
-    if(isZupt) {
-        // zero velocities and gently correct a bias by nudging velocity and position
-        VelX = 0.0f;
-        VelY = 0.0f;
-        // gently pull IMU integrated pos toward fused pos to avoid jump
+    float cr = cosf(rollRad), sr = sinf(rollRad);
+    float cp = cosf(pitchRad), sp = sinf(pitchRad);
+    float cy = cosf(yawRad), sy = sinf(yawRad);
+
+    float R00 = cy * cp;
+    float R01 = cy * sp * sr - sy * cr;
+    float R02 = cy * sp * cr + sy * sr;
+
+    float R10 = sy * cp;
+    float R11 = sy * sp * sr + cy * cr;
+    float R12 = sy * sp * cr - cy * sr;
+
+    float R20 = -sp;
+    float R21 = cp * sr;
+    float R22 = cp * cr;
+
+    float ax_w = R00 * ax_body + R01 * ay_body + R02 * az_body;
+    float ay_w = R10 * ax_body + R11 * ay_body + R12 * az_body;
+    float az_w = R20 * ax_body + R21 * ay_body + R22 * az_body;
+
+    az_w -= GRAV;
+
+    bool zupt_acc = DetectZUPTWindow();
+    bool zupt_gyro = (gyroMag < 0.03f);
+
+    bool isZUPT = zupt_acc && zupt_gyro;
+
+    static float biasX = 0, biasY = 0;
+    if(isZUPT) {
+        biasX = 0.999f * biasX + 0.001f * ax_w;
+        biasY = 0.999f * biasY + 0.001f * ay_w;
+    }
+
+    ax_w -= biasX;
+    ay_w -= biasY;
+
+    if(isZUPT) {
+        VelX = 0;
+        VelY = 0;
+
         PosXIMU = PosX;
         PosYIMU = PosY;
-        // you can also implement bias estimation here if needed
+
     } else {
-        // integrate (simple Euler)
-        VelX += linAX * dt;
-        VelY += linAY * dt;
+        VelX += ax_w * dt;
+        VelY += ay_w * dt;
+
+        VelX = constrain(VelX, -3.0f, 3.0f);
+        VelY = constrain(VelY, -3.0f, 3.0f);
 
         PosXIMU += VelX * dt;
         PosYIMU += VelY * dt;
@@ -111,12 +138,12 @@ void Sensor::Update(double dt) {
     GPS::Update();
 
     if(GPS::Gps.location.isUpdated() && GPS::Gps.location.isValid()) {
-        // Serial.print("Lat: ");
-        // Serial.print(gps.location.lat(), 6);
-        // Serial.print("  Lon: ");
-        // Serial.println(gps.location.lng(), 6);
-        // Serial.print("Satellites: ");
-        // Serial.println(gps.satellites.value());
+        float hdop = GPS::Gps.hdop.hdop();
+
+        if(hdop > 2.5f) {
+            return;
+        }
+
         double lat = GPS::Gps.location.lat();
         double lon = GPS::Gps.location.lng();
 
@@ -129,11 +156,20 @@ void Sensor::Update(double dt) {
         float gx, gy;
         LatLonToXY(lat, lon, gx, gy);
 
-        // complementary fusion: alpha trusts IMU, (1-alpha) trusts GPS
-        const float beta = 0.02f; // weight for GPS (tunable)
-        PosX = (1.0f - beta) * PosXIMU + beta * gx;
-        PosY = (1.0f - beta) * PosYIMU + beta * gy;
+        float dx = gx - PosXIMU;
+        float dy = gy - PosYIMU;
+        float dist = sqrtf(dx * dx + dy * dy);
 
-        // reset IMU integrated pos toward fused result to avoid long-term divergence
+        if(dist < 3.0f) {
+            const float beta = 0.08f;
+            PosX = (1 - beta) * PosXIMU + beta * gx;
+            PosY = (1 - beta) * PosYIMU + beta * gy;
+        } else {
+            PosX = PosXIMU;
+            PosY = PosYIMU;
+        }
+
+        PosXIMU = PosX;
+        PosYIMU = PosY;
     }
 }

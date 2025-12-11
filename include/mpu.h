@@ -4,8 +4,8 @@
 #include <Arduino.h>
 #include <MPU6050.h>
 
-#define ALPHA 0.98       // MPU Trust Factor
-#define GYRO_SCALE 131.0 // from MPU6050 datasheet (LSB per °/s)
+#define ALPHA 0.98
+#define GYRO_SCALE 131.0
 
 #define MPU_SCL 22 // ORANGE
 #define MPU_SDA 19 // YELLOW
@@ -34,7 +34,7 @@ class MPU {
         static void ResetYaw();
 
     public:
-        static Angle Old;
+        static Angle Gyro;
         static Angle Offset;
         static MPU6050 Mpu;
         static Acceleration Acc;

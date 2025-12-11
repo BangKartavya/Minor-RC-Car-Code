@@ -1,0 +1,169 @@
+<mxfile host="Electron" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.0.3 Chrome/140.0.7339.249 Electron/38.7.0 Safari/537.36" version="29.0.3">
+  <diagram name="Page-1" id="MjTjJHuP6vwsCJzpKGAp">
+    <mxGraphModel dx="4372" dy="1650" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="kBd92INq503Qbunfq_Zj-4" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="OkOueTHDwsdkYY8LhVD4-1" target="kBd92INq503Qbunfq_Zj-3">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="OkOueTHDwsdkYY8LhVD4-1" value="Initialize ESP32 Bluetooth&lt;div&gt;Calibrate MPU6050&lt;/div&gt;&lt;div&gt;Connect to GPS&lt;/div&gt;&lt;div&gt;Establish connection to Receiver ESP&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" parent="1" vertex="1">
+          <mxGeometry x="392.5" y="170" width="135" height="90" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-2" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="kBd92INq503Qbunfq_Zj-1" target="OkOueTHDwsdkYY8LhVD4-1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-1" value="Power ON" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="50" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-8" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="kBd92INq503Qbunfq_Zj-3" target="kBd92INq503Qbunfq_Zj-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-3" value="Wait For User Input" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="400" y="320" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-9" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.5;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="kBd92INq503Qbunfq_Zj-6" target="kBd92INq503Qbunfq_Zj-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-6" value="User Input &quot;X&quot;" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="415" y="414" width="90" height="86" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-19" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="kBd92INq503Qbunfq_Zj-7" target="kBd92INq503Qbunfq_Zj-18">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-7" value="Activate Obstacle Avoidance Mode" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="290" y="510" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-10" value="Yes" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="350" y="430" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-17" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="kBd92INq503Qbunfq_Zj-12" target="kBd92INq503Qbunfq_Zj-3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="670" y="350" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="690" y="540" />
+              <mxPoint x="690" y="350" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-12" value="Execute User Input" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="510" y="510" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-15" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.536;entryY=-0.025;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="kBd92INq503Qbunfq_Zj-6" target="kBd92INq503Qbunfq_Zj-12">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-16" value="No" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="510" y="430" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-21" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="kBd92INq503Qbunfq_Zj-18" target="kBd92INq503Qbunfq_Zj-20">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-18" value="Move Forward and Check for Front Obstacles" style="whiteSpace=wrap;html=1;rounded=1;" vertex="1" parent="1">
+          <mxGeometry x="290" y="650" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-24" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=1;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="1" source="kBd92INq503Qbunfq_Zj-20" target="kBd92INq503Qbunfq_Zj-18">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="470" y="680" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="480" y="780" />
+              <mxPoint x="480" y="680" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-30" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="kBd92INq503Qbunfq_Zj-20" target="kBd92INq503Qbunfq_Zj-29">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-20" value="Obstacle In Front" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="310" y="740" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-25" value="No" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="410" y="760" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-33" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="kBd92INq503Qbunfq_Zj-29" target="kBd92INq503Qbunfq_Zj-32">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-29" value="Stop and check Left Sensor for Obstacles" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="160" y="827" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-31" value="Yes" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="250" y="760" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-37" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="kBd92INq503Qbunfq_Zj-32" target="kBd92INq503Qbunfq_Zj-36">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-42" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="kBd92INq503Qbunfq_Zj-32" target="kBd92INq503Qbunfq_Zj-41">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-32" value="Obstacle in Left" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="180" y="920" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-39" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="kBd92INq503Qbunfq_Zj-36">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="390" y="650" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="540" y="960" />
+              <mxPoint x="540" y="630" />
+              <mxPoint x="390" y="630" />
+              <mxPoint x="390" y="650" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-36" value="Turn Left&amp;nbsp;&lt;div&gt;(90 Degrees)&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="320" y="930" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-38" value="No" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="260" y="940" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-45" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="kBd92INq503Qbunfq_Zj-41" target="kBd92INq503Qbunfq_Zj-44">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-41" value="Check List Sensor for Obstacles" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="40" y="1020" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-43" value="Yes" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="120" y="940" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-47" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="kBd92INq503Qbunfq_Zj-44" target="kBd92INq503Qbunfq_Zj-46">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-52" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;" edge="1" parent="1" source="kBd92INq503Qbunfq_Zj-44" target="kBd92INq503Qbunfq_Zj-51">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-44" value="Obstacle in Right" style="rhombus;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="60" y="1150" width="80" height="80" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-50" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.667;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="kBd92INq503Qbunfq_Zj-46" target="kBd92INq503Qbunfq_Zj-18">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="590" y="600" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="600" y="1190" />
+              <mxPoint x="600" y="600" />
+              <mxPoint x="370" y="600" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-46" value="Turn Right&lt;div&gt;(90 Degrees)&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="200" y="1160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-49" value="No" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="140" y="1170" width="60" height="30" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-54" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;entryX=0.335;entryY=0.025;entryDx=0;entryDy=0;entryPerimeter=0;" edge="1" parent="1" source="kBd92INq503Qbunfq_Zj-51" target="kBd92INq503Qbunfq_Zj-18">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="330" y="640" as="targetPoint" />
+            <Array as="points">
+              <mxPoint x="-70" y="589" />
+              <mxPoint x="330" y="589" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-51" value="Turn Back&lt;div&gt;(180 Degrees)&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+          <mxGeometry x="-120" y="1160" width="120" height="60" as="geometry" />
+        </mxCell>
+        <mxCell id="kBd92INq503Qbunfq_Zj-53" value="Yes" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" vertex="1" parent="1">
+          <mxGeometry x="10" y="1170" width="60" height="30" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

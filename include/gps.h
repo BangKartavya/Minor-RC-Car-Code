@@ -13,6 +13,7 @@ class GPS {
     public:
         static void Update();
         static void Init();
+        static void Print();
 
     public:
         static HardwareSerial GPS_Serial;

@@ -143,10 +143,12 @@ void Car::TurnAngle(float targetAngle, bool leftTurn) {
     analogWrite(ENA, 128);
     analogWrite(ENB, 128);
 
-    MPU::Old.yaw = 0;
-    while(fabs(MPU::Old.yaw) < targetAngle) {
+    MPU::Gyro.yaw = 0;
+    float cutoff = targetAngle - 10;
+    while(fabs(MPU::Gyro.yaw) < cutoff) {
         double dt = Time::ComputeDt();
         MPU::GetAngle(dt);
+        Serial.println("Angle : " + String(MPU::Gyro.yaw));
         yield();
     }
 
